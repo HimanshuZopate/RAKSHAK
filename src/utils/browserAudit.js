@@ -1,4 +1,4 @@
-﻿/**
+/**
  * browserAudit.js
  * ─────────────────────────────────────────────────────────────────────────────
  * Client-side telemetry collector for the Security Audit feature.

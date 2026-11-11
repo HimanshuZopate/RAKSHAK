@@ -371,8 +371,6 @@ async function resolvePublicIp(req: Request): Promise<string> {
 
 // ─── Audit log listing / retrieval ──────────────────────────────────────────
 
-const allowedAuditFilters = ['category', 'action', 'status', 'severity', 'resourceType'];
-
 const parsePagination = (value: unknown, fallback: number) => {
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;

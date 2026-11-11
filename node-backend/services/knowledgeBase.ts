@@ -51,8 +51,3 @@ export const findKnowledge = (question: string, limit = 3): KnowledgeItem[] => {
     .map(({ item }) => item);
 };
 
-export const getKnowledgeFallback = (question: string): string | null => {
-  const matches = findKnowledge(question);
-  if (!matches.length) return null;
-  return matches.map((item) => `${item.title}: ${item.content}`).join('\n\n');
-};

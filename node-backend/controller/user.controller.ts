@@ -2,16 +2,6 @@ import UserModel from "../model/user.model";
 import { Request, Response } from "express";
 import ResetTokenModel from "../model/resetToken.model";
 
-export const register = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-  try {
-    const user = await UserModel.create({ email, password });
-    return res.status(201).json({ user });
-  } catch (error) { 
-    return res.status(500).json({ error:"Registration Failed" });
-  }
-};
-
 export const forgotPassword = async (req: Request, res: Response) => {
 
     const { email } = req.body;

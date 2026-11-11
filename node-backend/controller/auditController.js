@@ -312,7 +312,6 @@ function resolvePublicIp(req) {
     });
 }
 // ─── Audit log listing / retrieval ──────────────────────────────────────────
-const allowedAuditFilters = ['category', 'action', 'status', 'severity', 'resourceType'];
 const parsePagination = (value, fallback) => {
     const parsed = Number(value);
     return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;

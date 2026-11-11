@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getKnowledgeFallback = exports.findKnowledge = void 0;
+exports.findKnowledge = void 0;
 const KNOWLEDGE = [
     {
         topic: 'phishing',
@@ -46,10 +46,3 @@ const findKnowledge = (question, limit = 3) => {
         .map(({ item }) => item);
 };
 exports.findKnowledge = findKnowledge;
-const getKnowledgeFallback = (question) => {
-    const matches = (0, exports.findKnowledge)(question);
-    if (!matches.length)
-        return null;
-    return matches.map((item) => `${item.title}: ${item.content}`).join('\n\n');
-};
-exports.getKnowledgeFallback = getKnowledgeFallback;

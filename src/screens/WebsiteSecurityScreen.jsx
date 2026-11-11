@@ -4,9 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '../utils/api';
 import {
   Globe,
-  Shield,
   ShieldCheck,
-  ShieldAlert,
   AlertTriangle,
   CheckCircle2,
   XCircle,
@@ -15,15 +13,12 @@ import {
   Search,
   RefreshCw,
   Lock,
-  ExternalLink,
   ChevronRight,
   ChevronDown,
   Info,
   Server,
   FileText,
-  Clock,
   Sparkles,
-  KeyRound,
   Layers,
   Check,
   Copy,
@@ -380,7 +375,6 @@ const WebsiteSecurityScreen = () => {
               {(() => {
                 const card = scanReport.overviewCards?.httpsSecurity || {};
                 const badge = STATUS_BADGE[card.status] || STATUS_BADGE.gray;
-                const IconComponent = badge.icon;
                 return (
                   <div className="rounded-3xl bg-slate-900/70 border border-slate-800 p-6 flex flex-col justify-between space-y-4 shadow-lg">
                     <div className="flex items-center justify-between">

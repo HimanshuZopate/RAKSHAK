@@ -28,7 +28,6 @@ import {
   Download,
   Clock,
   Radio,
-  FileCode,
 } from 'lucide-react';
 
 const iconMap = {
@@ -662,7 +661,7 @@ const ServiceDetailScreen = () => {
                 )}
               </div>
             </motion.div>
-          )}      )}
+          )}
         </AnimatePresence>
       </div>
 

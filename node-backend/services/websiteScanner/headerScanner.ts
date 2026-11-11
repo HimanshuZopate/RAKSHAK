@@ -243,7 +243,6 @@ export const inspectSecurityHeaders = async (target: ValidatedTarget): Promise<H
     const maxAgeMatch = hsts.match(/max-age=(\d+)/i);
     const maxAge = maxAgeMatch ? parseInt(maxAgeMatch[1], 10) : 0;
     const hasSubDomains = /includesubdomains/i.test(hsts);
-    const hasPreload = /preload/i.test(hsts);
 
     if (maxAge >= 31536000) {
       headerFindings.push({

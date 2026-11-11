@@ -108,18 +108,6 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
-/**
- * Validate URL format (only http/https)
- */
-function isValidHttpUrl(urlString: string): boolean {
-  try {
-    const url = new URL(urlString);
-    return url.protocol === 'http:' || url.protocol === 'https:';
-  } catch {
-    return false;
-  }
-}
-
 // ─── URL Analysis Engine ─────────────────────────────────────────────────────
 
 function analyzeUrl(rawUrl: string): AnalysisResult {
@@ -151,7 +139,6 @@ function analyzeUrl(rawUrl: string): AnalysisResult {
   }
 
   const hostname = url.hostname.toLowerCase();
-  const fullUrl = url.href.toLowerCase();
   const pathname = url.pathname.toLowerCase();
 
   // Check 1: IP-based URL

@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import OtpModal from "./components/OtpModal";
-import requestInstance from "../utils/axios";
-import { useNavigate } from "react-router-dom";
+import requestInstance from "../utils/api";
 import LoadingScreen from "./components/LoadingScreen";
 import FailureModal from "./components/FailureModal";
 

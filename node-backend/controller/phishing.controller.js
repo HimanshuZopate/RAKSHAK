@@ -88,18 +88,6 @@ function scoreToLevel(score) {
 function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
 }
-/**
- * Validate URL format (only http/https)
- */
-function isValidHttpUrl(urlString) {
-    try {
-        const url = new URL(urlString);
-        return url.protocol === 'http:' || url.protocol === 'https:';
-    }
-    catch (_a) {
-        return false;
-    }
-}
 // ─── URL Analysis Engine ─────────────────────────────────────────────────────
 function analyzeUrl(rawUrl) {
     const warnings = [];
@@ -128,7 +116,6 @@ function analyzeUrl(rawUrl) {
         };
     }
     const hostname = url.hostname.toLowerCase();
-    const fullUrl = url.href.toLowerCase();
     const pathname = url.pathname.toLowerCase();
     // Check 1: IP-based URL
     if (IP_URL_PATTERN.test(normalizedUrl)) {

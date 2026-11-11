@@ -1,15 +1,14 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@iconify/react';
 import {
-  Shield, ShieldCheck, ShieldAlert, KeyRound, Globe, Mail, Bug, Wifi,
-  Siren, ArrowLeft, ChevronRight, ChevronDown, ChevronUp, CheckCircle2,
+  Shield, KeyRound, Globe, Mail, Wifi,
+  Siren, ArrowLeft, ChevronRight, ChevronDown, CheckCircle2,
   XCircle, AlertTriangle, Info, RefreshCw, Play, RotateCcw, Trophy,
-  BookOpen, Target, Clock, Star, Layers, Lock, CreditCard, Link,
+  BookOpen, Target, Clock, Star, Layers, Lock,
   Eye, EyeOff, X, Check, AlertCircle, Sparkles, FileText,
-  BarChart3, Zap, Terminal, GraduationCap, Radar, Activity,
-  Upload, Network,
+  BarChart3, Zap, GraduationCap, Radar, Activity,
 } from 'lucide-react';
 import { IC } from '../utils/icons';
 import {
@@ -17,7 +16,7 @@ import {
   INCIDENT_SCENARIOS, SUSPICIOUS_FILE_SCENARIOS, DIFFICULTY_COLORS,
 } from '../utils/simulationScenarios';
 import {
-  getProgress, markSimulationComplete, addTopicExplored, resetProgress,
+  getProgress, markSimulationComplete, resetProgress,
 } from '../utils/simProgress';
 import { analyzePassword } from '../utils/passwordAnalyzer';
 import { generateSecurePassword } from '../utils/passwordGenerator';
@@ -32,12 +31,6 @@ const SIM_ICON_MAP = {
   Shield:   IC.simPrivacy,
   KeyRound: IC.simPassword,
   Siren:    IC.simIncident,
-};
-
-// Renders a vivid Iconify icon for simulation modules
-const SimIcon = ({ name, size = 28, className = '' }) => {
-  const iconStr = SIM_ICON_MAP[name] || IC.shield;
-  return <Icon icon={iconStr} width={size} height={size} className={className} />;
 };
 
 const resolveIcon = (name) => {

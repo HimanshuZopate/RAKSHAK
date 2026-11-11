@@ -1,13 +1,18 @@
 import { Request, Response, NextFunction } from 'express';
-import { verifyAccessToken, TokenUserPayload } from '../util/jwt.util';
+import { verifyAccessToken } from '../util/jwt.util';
 
-// Augment Express.User interface for JWT payloads.
+// Augment Express types for JWT payloads. `Request.user` is declared here
+// explicitly (it was previously supplied implicitly by an undeclared
+// @types/passport package in node_modules).
 declare global {
   namespace Express {
     interface User {
       userId?: string;
       email?: string;
       role?: string;
+    }
+    interface Request {
+      user?: User;
     }
   }
 }

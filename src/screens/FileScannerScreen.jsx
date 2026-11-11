@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
+import { API_BASE_URL } from '../utils/api';
 import {
   ShieldAlert,
   Upload,
@@ -21,7 +22,6 @@ import {
 } from 'lucide-react';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
 const SEVERITY_CONFIG = {
   CRITICAL: {
@@ -376,7 +376,7 @@ const FileScannerScreen = () => {
     formData.append('file', selectedFile);
 
     try {
-      const res = await axios.post(`${API_BASE}/scanners/analyze-file`, formData, {
+      const res = await axios.post(`${API_BASE_URL}/scanners/analyze-file`, formData, {
         withCredentials: true,
         headers: { 'Content-Type': 'multipart/form-data' },
         timeout: 90000, // 90s for large files

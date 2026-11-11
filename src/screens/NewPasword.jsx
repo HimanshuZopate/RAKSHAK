@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import requestInstance from "../utils/axios";
+import requestInstance from "../utils/api";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import LoadingScreen from "./components/LoadingScreen";

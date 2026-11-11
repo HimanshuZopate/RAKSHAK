@@ -13,7 +13,6 @@ import VerifyEmailScreen from './screens/VerifyEmailScreen';
 import VulnerabilitiesScreen from './screens/VulnerabilitiesScreen';
 import PhishingDetectorScreen from './screens/PhishingDetectorScreen';
 import SecurityAuditsScreen from './screens/SecurityAuditsScreen';
-import ClientAuditScreen from './screens/ClientAuditScreen';
 import FileScannerScreen from './screens/FileScannerScreen';
 import PasswordSecurityScreen from './screens/PasswordSecurityScreen';
 import WebsiteSecurityScreen from './screens/WebsiteSecurityScreen';

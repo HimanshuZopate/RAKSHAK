@@ -124,8 +124,6 @@ export const register = async (req: Request, res: Response) => {
       isEmailVerified: true,
     });
 
-    await newUser.save();
-
     const accessToken = generateAccessToken({
       userId: newUser._id.toString(),
       email: newUser.email,
@@ -524,18 +522,3 @@ export const verifyOtp = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Reset Password Controller (Legacy flow)
- */
-export const resetPassword = async (req: Request, res: Response) => {
-  try {
-    const { password } = req.body;
-    const resetToken = await ResetTokenModel.find({ password });
-    if (resetToken.length > 0) {
-      return res.status(200).json({ resetToken });
-    }
-    return res.status(404).json({ error: 'User not found' });
-  } catch (error) {
-    return res.status(500).json({ error });
-  }
-};

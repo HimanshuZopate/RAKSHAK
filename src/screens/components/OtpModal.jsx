@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import requestInstance from "../../utils/axios";
+import requestInstance from "../../utils/api";
 
 const OtpModal = ({ email }) => {
   const [otp, setOtp] = useState({

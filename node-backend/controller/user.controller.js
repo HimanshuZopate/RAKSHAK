@@ -12,20 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setNewPassword = exports.forgotPassword = exports.register = void 0;
+exports.setNewPassword = exports.forgotPassword = void 0;
 const user_model_1 = __importDefault(require("../model/user.model"));
 const resetToken_model_1 = __importDefault(require("../model/resetToken.model"));
-const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password } = req.body;
-    try {
-        const user = yield user_model_1.default.create({ email, password });
-        return res.status(201).json({ user });
-    }
-    catch (error) {
-        return res.status(500).json({ error: "Registration Failed" });
-    }
-});
-exports.register = register;
 const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.body;
     try {

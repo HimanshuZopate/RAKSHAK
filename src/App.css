@@ -2,32 +2,6 @@
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
 .auth-screen { position: relative; display: grid; place-items: center; min-height: 100vh; overflow: hidden; padding: 32px 18px; background: radial-gradient(circle at 15% 10%, #dbeafe, transparent 35%), #f8fafc; }
 .auth-card { position: relative; z-index: 1; width: min(100%, 430px); padding: 38px; border: 1px solid rgba(148,163,184,.2); border-radius: 28px; background: rgba(255,255,255,.9); box-shadow: 0 25px 80px rgba(15,23,42,.14); animation: auth-card-in .65s cubic-bezier(.2,.8,.2,1) both; }
 .auth-icon { display: grid; place-items: center; width: 58px; height: 58px; margin: 0 auto 18px; color: #2563eb; border-radius: 18px; background: #dbeafe; animation: auth-float 3.5s ease-in-out infinite; }
@@ -209,11 +183,3 @@ ol.ai-md-list { list-style: decimal; }
 @media (max-width: 680px) { .landing-nav { padding: 15px 18px; }.landing-menu-button { display: block; }.landing-links { display: none; position: absolute; top: 65px; left: 12px; right: 12px; flex-direction: column; align-items: stretch; gap: 4px; padding: 14px; border: 1px solid #1e293b; border-radius: 14px; background: #0b1324; }.landing-links.is-open { display: flex; }.landing-links a { padding: 11px; }.landing-auth-links { margin: 5px 0 0; padding-top: 8px; border-top: 1px solid #1e293b; }.landing-hero { padding: 60px 20px 40px; }.landing-hero h1 { font-size: 3.15rem; }.landing-hero-actions { align-items: stretch; flex-direction: column; }.landing-hero-actions a { justify-content: center; }.landing-visual { height: 360px; transform: scale(.78); margin: -15px -50px; width: calc(100% + 100px); }.landing-value-strip { grid-template-columns: repeat(2,1fr); margin-bottom: 30px; }.value-item { padding: 13px 8px; border: 0; }.landing-section-heading { display: block; }.landing-section-heading p { margin-top: 18px; }.service-grid, .steps-grid { grid-template-columns: 1fr; }.simulation-showcase { grid-template-columns: 1fr; }.simulation-tabs { border-right: 0; border-bottom: 1px solid rgba(148,163,184,.12); }.simulation-preview { padding: 35px 25px; }.landing-footer { grid-template-columns: 1fr 1fr; }.landing-footer small { grid-column: 1/-1; } }
 @media (prefers-reduced-motion: reduce) { .landing-page *, .landing-page *::before, .landing-page *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}

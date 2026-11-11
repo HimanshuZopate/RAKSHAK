@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resetPassword = exports.verifyOtp = exports.updateProfile = exports.getCurrentUser = exports.logout = exports.refreshTokenController = exports.login = exports.resendVerificationEmail = exports.verifyEmail = exports.register = void 0;
+exports.verifyOtp = exports.updateProfile = exports.getCurrentUser = exports.logout = exports.refreshTokenController = exports.login = exports.resendVerificationEmail = exports.verifyEmail = exports.register = void 0;
 const user_model_1 = __importDefault(require("../model/user.model"));
 const resetToken_model_1 = __importDefault(require("../model/resetToken.model"));
 const jwt_util_1 = require("../util/jwt.util");
@@ -104,7 +104,6 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             password,
             isEmailVerified: true,
         });
-        yield newUser.save();
         const accessToken = (0, jwt_util_1.generateAccessToken)({
             userId: newUser._id.toString(),
             email: newUser.email,
@@ -468,20 +467,3 @@ const verifyOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.verifyOtp = verifyOtp;
-/**
- * Reset Password Controller (Legacy flow)
- */
-const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { password } = req.body;
-        const resetToken = yield resetToken_model_1.default.find({ password });
-        if (resetToken.length > 0) {
-            return res.status(200).json({ resetToken });
-        }
-        return res.status(404).json({ error: 'User not found' });
-    }
-    catch (error) {
-        return res.status(500).json({ error });
-    }
-});
-exports.resetPassword = resetPassword;

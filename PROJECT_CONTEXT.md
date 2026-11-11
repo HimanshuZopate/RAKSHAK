@@ -45,7 +45,7 @@
 - DiceBear avatars.
 - All LLM calls use raw axios; there are no vendor SDKs.
 
-**Declared but unused, or planned:** `node-cron`, backend `socket.io-client`, `cookie`. The `GOOGLE_CLIENT_ID/SECRET/CALLBACK_URL` entries in `.env.example` and the passport packages present in `node_modules` (not in package.json) suggest Google OAuth was **planned or removed and is not implemented**. The `node-backend/config/` folder is empty.
+**Removed 2026-11-11 (were unused):** `node-cron`, backend `socket.io-client`, `cookie`, `@types/cookie`, `@types/node-cron`. The `GOOGLE_CLIENT_ID/SECRET/CALLBACK_URL` entries in `.env.example` and the passport packages that used to sit undeclared in `node_modules` (pruned 2026-11-11; `Request.user` is now declared in `middleware/verifyToken.ts`) suggest Google OAuth was **planned or removed and is not implemented**. The `node-backend/config/` folder is empty.
 
 **Env var names** (`.env.example`): PORT, NODE_ENV, CLIENT_URL, MONGO_URI, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY, GOOGLE_* (unused), SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, EMAIL_FROM, AI_ENABLED, AI_PROVIDER, GROQ_API_KEY, GROQ_MODEL, GEMINI_API_KEY, GEMINI_MODEL, OPENAI_API_KEY, OPENAI_MODEL, AI_REQUEST_TIMEOUT_MS.
 - The code also reads `TEMP_UPLOAD_DIR`, which is undocumented.
@@ -97,8 +97,8 @@ RAKSHAK/
 │  │          DashboardScreen, ServiceDetailScreen, VulnerabilitiesScreen, PhishingDetectorScreen,
 │  │          ClientAuditScreen, SecurityAuditsScreen, FileScannerScreen, PasswordSecurityScreen,
 │  │          WebsiteSecurityScreen, SimulationLabPage, AIRakshakScreen, ProfileScreen, NotificationsScreen
-│  │  └─ components/ OtpModal, LoadingScreen, SuccessModal (unused), FailureModal
-│  ├─ utils/ api.js, axios.js (shim), browserAudit.js, passwordAnalyzer.js, passwordGenerator.js,
+│  │  └─ components/ OtpModal, LoadingScreen, FailureModal
+│  ├─ utils/ api.js (exports default instance + API_BASE_URL), browserAudit.js, passwordAnalyzer.js, passwordGenerator.js,
 │  │         pdfGenerator.js, simProgress.js, simulationScenarios.js, icons.js
 │  └─ assets/ (png images)
 └─ node-backend/
@@ -109,7 +109,7 @@ RAKSHAK/
    │              phishing.controller, websiteSecurity.controller, aiController
    ├─ middleware/ verifyToken, rateLimiter, fileUpload, wafMiddleware
    ├─ model/ user, resetToken, target, scanReport, service, wafConfig, trafficLog, auditLog
-   ├─ services/ aiOrchestrator, aiProviderService, groqService (dead), cyberIntelligenceEngine,
+   ├─ services/ aiOrchestrator, aiProviderService, llmKeyPool, cyberIntelligenceEngine,
    │            knowledgeBase, auditService, fileScanner, nvdScanner,
    │            websiteScanner/{ssrfProtection, tlsScanner, headerScanner, scoreCalculator}
    ├─ scanners/ portScanner, headerScanner, systemAuditor, fileMonitor, malwareScanner (socket-driven)
@@ -138,7 +138,6 @@ Every backend `.ts` file has a compiled `.js` file beside it. **Always edit the 
   - `authLimiter`: 5 requests per 15 minutes, with one instance **shared by all auth routes**.
   - `emailLimiter`: 3 per hour.
   - `apiLimiter`: 200 per 15 minutes.
-- **Dead code:** `auth.controller.resetPassword` and `user.controller.register`.
 
 ### 6.2 Dashboard and Services Catalog
 - **Files:** `routes/services.ts` (inline handlers, verifyToken), `model/service.model.ts` (`seedServices`, `defaultServices`), `DashboardScreen.jsx`, `ServiceDetailScreen.jsx`.
@@ -167,7 +166,6 @@ Every backend `.ts` file has a compiled `.js` file beside it. **Always edit the 
 - **No SSRF protection on `target.host`.**
 - Each run saves a `ScanReport` and emits `scan-complete`. The frontend shows a live terminal and exports the report to PDF.
 - Note: services 1, 2, 3, 7 and 8 are all short-circuited to dedicated screens, so in practice this generic path is reached only for non-seeded IDs.
-- **Dead code:** `generateLogsForService` and `activeIntervals`.
 
 ### 6.4 Vulnerability (CVE) Scanner
 - **Files:** `routes/scanners.ts` (`POST /scanners/vulnerability`, **no auth**), `controller/scanners.ts`, `services/nvdScanner.ts`, `components/VulnerabilityScanner.jsx`, `VulnerabilitiesScreen.jsx`.
@@ -250,7 +248,7 @@ Every backend `.ts` file has a compiled `.js` file beside it. **Always edit the 
 - **No frontend screen was found** that consumes `/api/waf/*` or `live-traffic-update`. UNVERIFIED whether a UI was planned.
 
 ### 6.11 AI RAKSHAK Assistant (repaired 2026-11-11)
-- **Files:** `routes/ai.ts`, `controller/aiController.ts`, `services/aiOrchestrator.ts`, `services/aiProviderService.ts`, `services/llmKeyPool.ts` (new), `services/cyberIntelligenceEngine.ts`, `services/knowledgeBase.ts`, `services/groqService.ts` (dead), `src/screens/AIRakshakScreen.jsx`, tests in `node-backend/tests/aiProvider.test.ts`.
+- **Files:** `routes/ai.ts`, `controller/aiController.ts`, `services/aiOrchestrator.ts`, `services/aiProviderService.ts`, `services/llmKeyPool.ts` (new), `services/cyberIntelligenceEngine.ts`, `services/knowledgeBase.ts`, `src/screens/AIRakshakScreen.jsx`, tests in `node-backend/tests/aiProvider.test.ts`.
 - **Endpoints:**
 
   | Method | Path | Auth |
@@ -461,6 +459,13 @@ Outside `/api`: `GET /` (health check) and the Socket.io events listed in §4.
 - Email verification exists but is bypassed (`isEmailVerified: true`), probably for demo convenience.
 - Google OAuth was probably attempted and removed: there are GOOGLE_* env vars and stray passport packages.
 - A production build was made on 2026-10-15. Compiled `.js` files were last rebuilt then and match the `.ts` sources.
+
+- **Behaviour-preserving cleanup (2026-11-11).**
+  - Removed: unused imports and variables in 7 frontend files, the dead `SimIcon` component, a stray JSX text token, and the BOM in `browserAudit.js`.
+  - Deleted: `src/utils/axios.js` (re-export shim; its imports now point straight at `api.js`), `SuccessModal.jsx`, the empty `logo.svg`, and the unused CRA CSS.
+  - Removed backend dead code: `generateLogsForService`/`activeIntervals`, `groqService.ts`, `getKnowledgeFallback`, the unrouted `resetPassword`/`register` handlers, and unused locals. `register` now saves once instead of twice.
+  - The base URL is defined once (`API_BASE_URL` in `api.js`). The 5 unused npm packages were removed.
+  - Verification: API snapshot of 24 cases identical, the register → refresh → login flow and the Socket.io handshake identical on old vs new code, and 12-page screenshots identical apart from animation frames.
 
 ## 12. Completed Features
 - Signup, login, logout, refresh, `/me`, profile edit.
