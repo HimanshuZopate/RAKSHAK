@@ -1,23 +1,43 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
-/node_modules
-/.pnp
+# ── Secrets: never commit ───────────────────────────────────────────────────
+# Matches at any depth (root and node-backend/). Only the template is tracked.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+id_rsa*
+credentials*.json
+service-account*.json
+secrets/
+
+# ── Dependencies (any folder, incl. node-backend/node_modules) ──────────────
+node_modules/
+.pnp
 .pnp.js
 
-# testing
-/coverage
+# ── Build output ────────────────────────────────────────────────────────────
+build/
+dist/
+coverage/
+*.tsbuildinfo
 
-# production
-/build
-
-# misc
-.DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
+# ── Logs & runtime files ────────────────────────────────────────────────────
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+logs/
+tmp/
+uploads/
+
+# ── OS & editor files ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
