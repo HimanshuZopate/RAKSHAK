@@ -8,7 +8,9 @@
     "build": "tsc",
     "start": "ts-node index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test:ai": "node -r ts-node/register --test tests/aiProvider.test.ts"
+    "test:ai": "node -r ts-node/register --test tests/aiProvider.test.ts",
+    "vuln-lab": "node scripts/vuln-lab.js",
+    "test:vuln": "node -r ts-node/register --test tests/vulnScanner.test.ts"
   },
   "keywords": [],
   "author": "",

@@ -167,13 +167,38 @@ Every backend `.ts` file has a compiled `.js` file beside it. **Always edit the 
 - Each run saves a `ScanReport` and emits `scan-complete`. The frontend shows a live terminal and exports the report to PDF.
 - Note: services 1, 2, 3, 7 and 8 are all short-circuited to dedicated screens, so in practice this generic path is reached only for non-seeded IDs.
 
-### 6.4 Vulnerability (CVE) Scanner
-- **Files:** `routes/scanners.ts` (`POST /scanners/vulnerability`, **no auth**), `controller/scanners.ts`, `services/nvdScanner.ts`, `components/VulnerabilityScanner.jsx`, `VulnerabilitiesScreen.jsx`.
-- **The target is never contacted.** `mockServiceDetection` returns `apache 2.4.49` if the target string contains "apache", otherwise `nginx 1.21` and `openssh 8.2`. It then runs an NVD keyword search (5 results, 1s delay between calls, no timeout).
-- On HTTP 403 or 429 the backend **invents `CVE-MOCK-xxx` HIGH entries**.
-- On any error the frontend **falls back to hardcoded mock CVEs**.
-- The UI shows a recharts bar chart, a daisyUI table, a remediation modal (generic text) and a jsPDF report.
-- Results are not persisted; only audit events are written.
+### 6.4 Vulnerability Scanner (rebuilt 2026-11-11: real web vulnerability assessment)
+- **UI:** `/vulnerabilities` → `src/screens/VulnerabilitiesScreen.jsx` → `src/components/VulnerabilityScanner.jsx`, a container with three views:
+  - `ScanLauncher` (target, authorisation checkbox, profiles, history)
+  - `LiveScan` (real Socket.io progress, with REST polling as fallback)
+  - `ScanReport` (score ring, Recharts severity chart, findings via `FindingCard`, TLS, technologies, headers, checks, limitations)
+  - PDF export in `src/components/vulnScanner/reportPdf.js`, using jsPDF + `autoTable(doc, …)`
+- **API** (all `verifyToken`; starts limited to 10 per 15 min per user, reads 120 per min):
+
+  | Method | Path | Purpose |
+  |---|---|---|
+  | GET | `/api/scanners/web-scans/profiles` | Profiles and their checks |
+  | POST | `/api/scanners/web-scans` | Start a scan: `{url, profile: quick\|standard\|comprehensive, authorizationConfirmed: true}` → 202 `{scan}` |
+  | GET | `/api/scanners/web-scans` | History |
+  | GET | `/api/scanners/web-scans/:id` | Report, or `live` progress while running |
+  | POST | `/api/scanners/web-scans/:id/cancel` | Cancel a running scan |
+
+  - Ownership is enforced in the query, so another user's scan returns 404.
+  - At most one active scan per user and 3 globally.
+  - Socket events go only to the private room `user:<id>`: `vuln-scan:progress` and `vuln-scan:complete`.
+  - The legacy `POST /api/scanners/vulnerability` (keyword CVE lookup with mock detection) is kept for API compatibility, but the UI no longer uses it.
+- **Engine** (`node-backend/services/vulnScanner/`):
+  - `targetGuard.ts`: SSRF protection. Reuses `isPrivateOrReservedIP` and adds NAT64, 6to4, Teredo and `::`-prefixed addresses. NAT64 records with an embedded public IPv4 are unwrapped and skipped. Ports are restricted, and every hop is re-resolved and re-validated. `VULN_SCANNER_LAB_TARGETS` is an exact loopback `host:port` allowlist for the demo lab.
+  - `safeHttp.ts`: pinned-IP client (lookup supports `opts.all`). GET/HEAD/OPTIONS/TRACE only, fixed request headers, manual redirects with loop detection, timeouts, a response-size cap, bounded gzip/br decompression, a per-scan semaphore and request budget, and AbortSignal cancellation.
+  - `checks/`: connectivity, headers (CSP parser), tls (`checkServerIdentity`, trust-error classification, TLS 1.0–1.3 probes with SECLEVEL=0), cookies (values discarded), cors, methods, exposure (banners, 404 stack traces, listings, signature-validated sensitive paths, source maps), content (mixed content, insecure forms), fingerprint (explicit-version evidence only, CPE map), activeProbes (reflection context, error-based SQLi with escaped-quote differential and repeatability, open redirect to example.com using the submitted URL's parameters), cveCorrelation (NVD `cpeName` + `isVulnerable`, rate-limited, 24 h in-memory cache, labelled potential).
+  - `scoring.ts`: risk = 100 × (1 − Π(1 − pᵢ/100)), where pᵢ = severity weight (40/25/10/3/0) × evidence factor. Security score = 100 − risk.
+  - `orchestrator.ts`: profiles, time and request budgets, progress, cancellation, `recoverInterruptedScans()` at startup, and audit events.
+- **Database:** extends the `scanreports` collection (no new collection). New documents have `kind: 'web-vulnerability'` plus `scanStatus`, `targetUrl`, `profile`, `summary`, `webFindings`, `checks`, `technologies`, `tls`, `headerSnapshot`, `limitations` and `scannerVersion`. The legacy `target` and `status` fields are required only when `kind` is absent. Index `{user, kind, createdAt}`.
+- **Demo lab:** `npm run vuln-lab` (in `node-backend/scripts/vuln-lab.js`, bound to 127.0.0.1) serves an insecure site on 4455 and a hardened site on 4456. Set `VULN_SCANNER_LAB_TARGETS=127.0.0.1:4455,127.0.0.1:4456` to allow scanning them.
+- **Tests:** `npm run test:vuln` (9 unit tests). End-to-end runs against the lab, badssl.com and testasp.vulnweb.com are documented in the delivery notes.
+- **Not implemented:**
+  - OWASP ZAP baseline (Docker daemon not running and no ZAP image here).
+  - Path traversal, blind or time-based SQL injection, authenticated scanning and crawling.
 
 ### 6.5 File Scanner
 - **Files:** `POST /scanners/analyze-file` (**no auth**), `middleware/fileUpload.ts`, `services/fileScanner.ts`, `FileScannerScreen.jsx`.
@@ -484,7 +509,7 @@ Outside `/api`: `GET /` (health check) and the Socket.io events listed in §4.
 ## 13. Pending / Partial Features
 - Website header scanning is broken on Node 24.
 - Office and PDF content scanning is broken.
-- The CVE scanner uses mock service detection and invents fake fallback CVEs.
+- ~~The CVE scanner uses mock service detection and invents fake fallback CVEs.~~ Replaced 2026-11-11 by the real web vulnerability scanner (§6.4); only the unused legacy endpoint still has the mock logic.
 - The socket execution path uses server-local scanners, and the file-integrity monitor does nothing.
 - Email verification is not enforced.
 - The password-reset email flow is missing; there is no reset email.

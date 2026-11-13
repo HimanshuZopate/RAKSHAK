@@ -13,6 +13,7 @@ import { wafMiddleware } from './middleware/wafMiddleware';
 import { setupSocketIO } from './socket/serviceSocket';
 import { seedServices } from './model/service.model';
 import { initializeAIProviders } from './services/aiProviderService';
+import { recoverInterruptedScans } from './services/vulnScanner/orchestrator';
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -68,6 +69,7 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 // 4. Connect to MongoDB and seed default services
 connectDB().then(() => {
   seedServices();
+  recoverInterruptedScans(); // web scans left "running" by a previous process
 });
 
 // 6. Base Health Check

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setupSocketIO = exports.emitLiveTrafficUpdate = exports.getSocketIO = void 0;
+exports.setupSocketIO = exports.emitLiveTrafficUpdate = exports.emitToUser = exports.getSocketIO = void 0;
 const socket_io_1 = require("socket.io");
 const jwt_util_1 = require("../util/jwt.util");
 const service_model_1 = __importDefault(require("../model/service.model"));
@@ -41,6 +41,11 @@ const parseRawCookieHeader = (rawCookie) => {
 let globalIoInstance = null;
 const getSocketIO = () => globalIoInstance;
 exports.getSocketIO = getSocketIO;
+/** Sends an event only to the sockets of one authenticated user (private room). */
+const emitToUser = (userId, event, payload) => {
+    globalIoInstance === null || globalIoInstance === void 0 ? void 0 : globalIoInstance.to(`user:${userId}`).emit(event, payload);
+};
+exports.emitToUser = emitToUser;
 const emitLiveTrafficUpdate = (log) => {
     if (globalIoInstance) {
         globalIoInstance.emit('live-traffic-update', log);
@@ -93,16 +98,19 @@ const setupSocketIO = (httpServer) => {
         }
     });
     io.on('connection', (socket) => {
-        var _a, _b;
+        var _a, _b, _c, _d;
         const authSocket = socket;
         const userEmail = ((_b = (_a = authSocket.data) === null || _a === void 0 ? void 0 : _a.user) === null || _b === void 0 ? void 0 : _b.email) || 'authenticated-user';
+        // Private room for per-user events (e.g. vulnerability scan progress).
+        if ((_d = (_c = authSocket.data) === null || _c === void 0 ? void 0 : _c.user) === null || _d === void 0 ? void 0 : _d.userId)
+            socket.join(`user:${authSocket.data.user.userId}`);
         console.log(`🔌 [SOCKET CONNECTED] Client: ${socket.id} | User: ${userEmail}`);
         /**
          * Listener: start-service-execution
          * Simulates live security scanning via 800ms log streams and updates lastRun in MongoDB
          */
         socket.on('start-service-execution', (payload) => __awaiter(void 0, void 0, void 0, function* () {
-            var _c, _d, _e, _f;
+            var _e, _f, _g, _h;
             try {
                 const { serviceId, targetId } = payload;
                 console.log(`🚀 [SERVICE RUN START] Client ${socket.id} initiated execution for service: ${serviceId} on target: ${targetId}`);
@@ -172,7 +180,7 @@ const setupSocketIO = (httpServer) => {
                 service.status = 'Active';
                 yield service.save();
                 const scanReport = yield scanReport_model_1.ScanReportModel.create({
-                    user: ((_d = (_c = authSocket.data) === null || _c === void 0 ? void 0 : _c.user) === null || _d === void 0 ? void 0 : _d.userId) || ((_f = (_e = authSocket.data) === null || _e === void 0 ? void 0 : _e.user) === null || _f === void 0 ? void 0 : _f._id) || target.user,
+                    user: ((_f = (_e = authSocket.data) === null || _e === void 0 ? void 0 : _e.user) === null || _f === void 0 ? void 0 : _f.userId) || ((_h = (_g = authSocket.data) === null || _g === void 0 ? void 0 : _g.user) === null || _h === void 0 ? void 0 : _h._id) || target.user,
                     target: target._id,
                     service: service.name,
                     status: findings.length > 0 ? 'Warning' : 'Success',

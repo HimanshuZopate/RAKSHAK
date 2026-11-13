@@ -17,6 +17,7 @@ const wafMiddleware_1 = require("./middleware/wafMiddleware");
 const serviceSocket_1 = require("./socket/serviceSocket");
 const service_model_1 = require("./model/service.model");
 const aiProviderService_1 = require("./services/aiProviderService");
+const orchestrator_1 = require("./services/vulnScanner/orchestrator");
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3001;
 const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
@@ -62,6 +63,7 @@ app.use(express_1.default.urlencoded({ extended: true, limit: '10kb' }));
 // 4. Connect to MongoDB and seed default services
 (0, mogoClient_1.connectDB)().then(() => {
     (0, service_model_1.seedServices)();
+    (0, orchestrator_1.recoverInterruptedScans)(); // web scans left "running" by a previous process
 });
 // 6. Base Health Check
 app.get('/', (req, res) => {

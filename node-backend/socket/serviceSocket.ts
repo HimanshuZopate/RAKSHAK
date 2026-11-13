@@ -35,6 +35,11 @@ let globalIoInstance: Server | null = null;
 
 export const getSocketIO = (): Server | null => globalIoInstance;
 
+/** Sends an event only to the sockets of one authenticated user (private room). */
+export const emitToUser = (userId: string, event: string, payload: unknown) => {
+  globalIoInstance?.to(`user:${userId}`).emit(event, payload);
+};
+
 export const emitLiveTrafficUpdate = (log: any) => {
   if (globalIoInstance) {
     globalIoInstance.emit('live-traffic-update', log);
@@ -97,6 +102,8 @@ export const setupSocketIO = (httpServer: HttpServer): Server => {
   io.on('connection', (socket: Socket) => {
     const authSocket = socket as AuthenticatedSocket;
     const userEmail = authSocket.data?.user?.email || 'authenticated-user';
+    // Private room for per-user events (e.g. vulnerability scan progress).
+    if (authSocket.data?.user?.userId) socket.join(`user:${authSocket.data.user.userId}`);
 
     console.log(`🔌 [SOCKET CONNECTED] Client: ${socket.id} | User: ${userEmail}`);
 
